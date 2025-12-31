@@ -23,15 +23,6 @@
       text-align: center;
       padding: 20px;
     }
-
-    /* Hide Vocaroo player */
-    #vocaroo {
-      position: fixed;
-      top: 0;
-      left: 0;
-      opacity: 0;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
@@ -39,15 +30,14 @@
 <div id="overlay">Tap anywhere to start the New Year Show!</div>
 <canvas id="canvas"></canvas>
 
-<!-- Vocaroo player -->
-<div id="vocaroo">
-  <iframe width="300" height="60" src="https://vocaroo.com/embed/1hsVQEDJTOXT?autoplay=1" frameborder="0" allow="autoplay"></iframe>
-</div>
+<!-- Local audio file -->
+<audio id="music" src="light.mp3" preload="auto"></audio>
 
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const overlay = document.getElementById("overlay");
+const music = document.getElementById("music");
 
 function resize() {
   canvas.width = window.innerWidth;
@@ -94,17 +84,17 @@ function explodeText(text, x, y) {
   const data = tctx.getImageData(0,0,canvas.width,canvas.height).data;
 
   for (let i=0; i<data.length; i+=4) {
-    if (data[i+3]>150 && Math.random()<0.12) {
+    if (data[i+3]>150 && Math.random()<0.25) { // more particles = clearer text
       const px = (i/4)%canvas.width;
       const py = Math.floor(i/4/canvas.width);
       const angle = Math.random()*Math.PI*2;
-      const speed = Math.random()*0.5 + 0.2;
+      const speed = Math.random()*0.2 + 0.1; // slower so text stays
       particles.push({
         x:px, y:py,
         vx: Math.cos(angle)*speed,
         vy: Math.sin(angle)*speed,
-        life: 480,
-        hold: 90,
+        life: 480, // longer life
+        hold: 90,  // hold in place for ~1.5s
         color:`hsl(${Math.random()*360},100%,60%)`
       });
     }
@@ -129,6 +119,7 @@ function explodeHeart(x, y) {
 // Fireworks timeline
 function startShow() {
   overlay.style.display = "none";
+  music.play(); // start music
 
   setTimeout(()=>showPhase=1,5000);  // text
   setTimeout(()=>showPhase=2,12000); // heart
